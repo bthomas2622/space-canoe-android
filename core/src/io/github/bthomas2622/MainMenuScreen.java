@@ -35,6 +35,11 @@ public class MainMenuScreen implements Screen {
     Music introMusic;
     AssetManager assetManager;
     boolean loaded = false;
+    float enterWidth;
+    GlyphLayout glyphLayout;
+    String item;
+    FreeTypeFontGenerator generator;
+    FreeTypeFontGenerator.FreeTypeFontParameter parameter;
 
 
     public MainMenuScreen(final SpaceCanoe gam){
@@ -58,6 +63,17 @@ public class MainMenuScreen implements Screen {
         assetManager = new AssetManager();
         assetManager.load("intro.mp3", Music.class);
         assetManager.finishLoading();
+
+        generator = new FreeTypeFontGenerator(Gdx.files.internal("SpaceMono-Bold.ttf"));
+        parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
+        parameter.size = 30;
+        gameFont = generator.generateFont(parameter);
+        //generating a glyph layout to get the length of the string so i can center it
+        glyphLayout = new GlyphLayout();
+        item = "TOUCH ANYWHERE TO PLAY";
+        glyphLayout.setText(gameFont,item);
+        enterWidth = glyphLayout.width;
+        generator.dispose(); //dispose generator to avoid memory leaks
     }
 
     public boolean startMusic() {
@@ -81,16 +97,7 @@ public class MainMenuScreen implements Screen {
         }
         Gdx.gl.glClearColor(0,0,0,0);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-        FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("SpaceMono-Bold.ttf"));
-        FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
-        parameter.size = 30;
-        gameFont = generator.generateFont(parameter);
-        //generating a glyph layout to get the length of the string so i can center it
-        GlyphLayout glyphLayout = new GlyphLayout();
-        String item = "TOUCH ANYWHERE TO PLAY";
-        glyphLayout.setText(gameFont,item);
-        float enterWidth = glyphLayout.width;
-        generator.dispose(); //dispose generator to avoid memory leaks
+        //enterWidth = glyphLayout.width;
         camera.update();
         game.batch.setProjectionMatrix(camera.combined);
         game.batch.begin();

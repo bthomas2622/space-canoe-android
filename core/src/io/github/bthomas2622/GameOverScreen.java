@@ -43,6 +43,15 @@ public class GameOverScreen implements Screen {
     AssetManager assetManager;
     boolean loaded = false;
     boolean exploded = false;
+    FreeTypeFontGenerator generator;
+    FreeTypeFontGenerator.FreeTypeFontParameter gameOverParameter;
+    GlyphLayout endGlyphLayout;
+    FreeTypeFontGenerator.FreeTypeFontParameter scoreParameter;
+    GlyphLayout scoreGlyphLayout;
+    FreeTypeFontGenerator.FreeTypeFontParameter highScoreParameter;
+    FreeTypeFontGenerator.FreeTypeFontParameter enterParameter;
+    GlyphLayout enterLayout;
+    float enterWidth;
 
     public boolean startMusic() {
         if(assetManager.isLoaded("gameOver.mp3") & assetManager.isLoaded("explosion.mp3")) {
@@ -93,6 +102,40 @@ public class GameOverScreen implements Screen {
 //        collisionSound = Gdx.audio.newSound(Gdx.files.internal("explosion.mp3"));
 //        collisionSound.play(.10f);
 //        gameOverMusic.play();
+
+        generator = new FreeTypeFontGenerator(Gdx.files.internal("SpaceMono-Bold.ttf"));
+        gameOverParameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
+        gameOverParameter.size = 80;
+        endFont = generator.generateFont(gameOverParameter);
+        //generating a glyph layout to get the length of the string so i can center it
+        endGlyphLayout = new GlyphLayout();
+        gameOver = "GAME OVER";
+        endGlyphLayout.setText(endFont,gameOver);
+        gameOverWidth = endGlyphLayout.width;
+        //Score font
+        scoreParameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
+        scoreParameter.size = 40;
+        scoreParameter.color = Color.RED;
+        scoreFont = generator.generateFont(scoreParameter);
+        scoreGlyphLayout = new GlyphLayout();
+        score = "Score: " + String.valueOf(debrisDodged) + "\n" + "Paddles: " + String.valueOf(timesRowed);
+        scoreGlyphLayout.setText(scoreFont, score);
+        scoreWidth = scoreGlyphLayout.width;
+        //High Score font
+        highScoreParameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
+        highScoreParameter.size = 40;
+        highScoreParameter.color = Color.GREEN;
+        highScoreFont = generator.generateFont(highScoreParameter);
+        highScoreString = "HIGH SCORE: " + String.valueOf(highScore);
+        //press enter to play again text
+        enterParameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
+        enterParameter.size = 30;
+        enterFont = generator.generateFont(enterParameter);
+        //generating a glyph layout to get the length of the string so i can center it
+        enterLayout = new GlyphLayout();
+        enterLayout.setText(enterFont,enterString);
+        enterWidth = enterLayout.width;
+        generator.dispose(); //dispose generator to avoid memory leaks
     }
 
     @Override
@@ -105,39 +148,6 @@ public class GameOverScreen implements Screen {
         }
         Gdx.gl.glClearColor(0, 0, 0, 0);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-        FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("SpaceMono-Bold.ttf"));
-        FreeTypeFontGenerator.FreeTypeFontParameter gameOverParameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
-        gameOverParameter.size = 80;
-        endFont = generator.generateFont(gameOverParameter);
-        //generating a glyph layout to get the length of the string so i can center it
-        GlyphLayout endGlyphLayout = new GlyphLayout();
-        gameOver = "GAME OVER";
-        endGlyphLayout.setText(endFont,gameOver);
-        gameOverWidth = endGlyphLayout.width;
-        //Score font
-        FreeTypeFontGenerator.FreeTypeFontParameter scoreParameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
-        scoreParameter.size = 40;
-        scoreParameter.color = Color.RED;
-        scoreFont = generator.generateFont(scoreParameter);
-        GlyphLayout scoreGlyphLayout = new GlyphLayout();
-        score = "Score: " + String.valueOf(debrisDodged) + "\n" + "Paddles: " + String.valueOf(timesRowed);
-        scoreGlyphLayout.setText(scoreFont, score);
-        scoreWidth = scoreGlyphLayout.width;
-        //High Score font
-        FreeTypeFontGenerator.FreeTypeFontParameter highScoreParameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
-        highScoreParameter.size = 40;
-        highScoreParameter.color = Color.GREEN;
-        highScoreFont = generator.generateFont(highScoreParameter);
-        highScoreString = "HIGH SCORE: " + String.valueOf(highScore);
-        //press enter to play again text
-        FreeTypeFontGenerator.FreeTypeFontParameter enterParameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
-        enterParameter.size = 30;
-        enterFont = generator.generateFont(enterParameter);
-        //generating a glyph layout to get the length of the string so i can center it
-        GlyphLayout enterLayout = new GlyphLayout();
-        enterLayout.setText(enterFont,enterString);
-        float enterWidth = enterLayout.width;
-        generator.dispose(); //dispose generator to avoid memory leaks
         camera.update();
         game.batch.setProjectionMatrix(camera.combined);
         game.batch.begin();
@@ -183,6 +193,8 @@ public class GameOverScreen implements Screen {
         backgroundSpaceImage.dispose();
         endFont.dispose();
         scoreFont.dispose();
+        highScoreFont.dispose();
+        enterFont.dispose();
         gameOverMusic.dispose();
         collisionSound.dispose();
     }
